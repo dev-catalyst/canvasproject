@@ -30,6 +30,14 @@
 
   .canvas-container {
     position: relative;
+
+    .invisible-border {
+      border: 1px dashed transparent;
+    }
+
+    .border {
+      border: 1px dashed #000;
+    }
     .product-photo {
       height: 510px;
       position: absolute;
