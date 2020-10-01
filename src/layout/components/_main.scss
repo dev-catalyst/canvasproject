@@ -9,12 +9,16 @@
     padding: 40px;
     background-color: #fff;
 
+    .color-picker {
+      margin: 20px 0;
+    }
+
     input {
       padding: 15px;
     }
 
     button {
-      margin: 0 20px;
+      // margin: 0 20px;
       padding: 10px 20px;
       background-color: #1f51cf;
       color: #fff;
