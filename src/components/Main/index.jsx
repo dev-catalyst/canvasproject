@@ -46,9 +46,7 @@ const MainSecion = () => {
     for (let i = textsObj.length - 1; i >= 0; i--) {
       let r = textsObj[i];
       if (r.isSelected) {
-        console.log("selected");
         if (anchorHitTest(mx, my, r)) {
-          console.log(true);
           draggingResizer = true;
           r.isResizing = true;
         }
@@ -71,22 +69,10 @@ const MainSecion = () => {
     startY = my;
   }
 
-  function drawResizeImage(element) {
-    let context = canvasRef.current.getContext("2d");
-    let image = new Image();
-    image.src = resizeIcon;
-    context.drawImage(
-      image,
-      element.x + element.width,
-      element.y + element.height
-    );
-  }
-
   function canvasMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
     if (draggingResizer) {
-      console.log("dragging resizer");
       let mx = parseInt(e.clientX - offsetX);
       let my = parseInt(e.clientY - offsetY);
 
@@ -94,21 +80,12 @@ const MainSecion = () => {
       let dy = my - startY;
 
       let textsObj = texts;
-      // move each rect that isDragging
-      // by the distance the mouse has moved
-      // since the last mousemove
+      let context = canvasRef.current.getContext("2d");
       for (let i = 0; i < textsObj.length; i++) {
         let r = textsObj[i];
-        if (
-          r.isResizing
-          // &&
-          // r.x + dx > 0 &&
-          // r.y + dy > 0 &&
-          // r.x + r.width + dx < canvasRef.current.width &&
-          // r.y + r.height + dy < canvasRef.current.height
-        ) {
-          r.width += dx;
+        if (r.isResizing) {
           r.height += dy;
+          r.width = context.measureText(r.value).width;
         }
       }
       setTexts(textsObj);
@@ -173,6 +150,17 @@ const MainSecion = () => {
     clearDragFlags();
   }
 
+  function drawResizeImage(element) {
+    let context = canvasRef.current.getContext("2d");
+    let image = new Image();
+    image.src = resizeIcon;
+    context.drawImage(
+      image,
+      element.x + element.width,
+      element.y + element.height
+    );
+  }
+
   function anchorHitTest(mx, my, element) {
     if (
       mx > element.x + element.width &&
@@ -180,11 +168,8 @@ const MainSecion = () => {
       my > element.y + element.height &&
       my < element.y + element.height + 24
     ) {
-      console.log(true);
       return true;
     } else {
-      console.log(false);
-
       return false;
     }
   }
@@ -242,7 +227,6 @@ const MainSecion = () => {
         context.rect(text.x, text.y, text.width, text.height);
         context.closePath();
         context.stroke();
-        // drawAnchorsOfSelectedElement(text);
       }
       if (text.isResizing) {
         drawResizeImage(text);
