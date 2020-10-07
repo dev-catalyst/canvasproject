@@ -6,29 +6,53 @@
 
   .app-menu {
     width: 550px;
-    padding: 40px;
+    padding: 25px 40px;
     background-color: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 
-    .color-picker {
-      margin: 20px 0;
-    }
-
-    input {
-      padding: 15px;
-    }
-
-    button {
-      // margin: 0 20px;
-      padding: 10px 20px;
-      background-color: #1f51cf;
-      color: #fff;
-      border-radius: 4px;
-      border: none;
-      font-size: 16px;
-
-      &:focus {
-        outline: none;
+    .text-enter {
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      .color-picker {
+        margin: 20px 0;
       }
+
+      input {
+        padding: 15px;
+      }
+
+      .rotation-wrap {
+        margin-bottom: 20px;
+        p {
+          margin-bottom: 0px;
+        }
+        .rotation {
+          display: flex;
+          align-items: center;
+
+          span {
+            margin: 0 20px;
+          }
+        }
+      }
+
+      button {
+        // margin: 0 20px;
+        padding: 10px 20px;
+        background-color: #1f51cf;
+        color: #fff;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+    .image-upload {
+      margin-top: 60px;
     }
   }
 
