@@ -47,7 +47,7 @@ const MainSection = () => {
     let elementsObj = elements;
     drawElements(elementsObj);
     clearDragFlags();
-    // setCurrentSelected(null);
+    setCurrentSelected(null);
     // test each text to see if mouse is inside
     for (let i = elementsObj.length - 1; i >= 0; i--) {
       let r = elementsObj[i];
@@ -96,8 +96,13 @@ const MainSection = () => {
           r.x + r.width + dx + 24 < canvasRef.current.width &&
           r.y + r.height + dy + 24 < canvasRef.current.height
         ) {
-          r.height += dy;
-          r.width = context.measureText(r.value).width;
+          if (r.type === "picture") {
+            r.height += dy;
+            r.width += dx;
+          } else {
+            r.height += dy;
+            r.width = context.measureText(r.value).width;
+          }
         }
       }
       setElements(elementsObj);
@@ -183,7 +188,7 @@ const MainSection = () => {
   }, [picture]);
 
   function drawPicture(imageSrc) {
-    let ctx = canvasRef.current.getContext("2d");
+    // let ctx = canvasRef.current.getContext("2d");
     var reader = new FileReader();
     reader.onload = function (event) {
       var img = new Image();
@@ -198,7 +203,7 @@ const MainSection = () => {
         };
         setPicture(imgObj);
         // console.log(imgObj);
-        ctx.drawImage(img, 0, 0, this.width, this.height);
+        // ctx.drawImage(img, 0, 0, this.width, this.height);
       };
       img.src = event.target.result;
     };
@@ -330,8 +335,8 @@ const MainSection = () => {
         context.fillText(text.value, text.x, text.height + text.y);
       } else if (text.type === "picture") {
         let image = new Image();
-        image.src = text.src;
-        context.drawImage(image, 0, 0, text.width, text.height);
+        image.src = text.value;
+        context.drawImage(image, text.x, text.y, text.width, text.height);
       }
       if (text.isDragging && text.isSelected) {
         context.beginPath();
