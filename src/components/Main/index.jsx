@@ -43,7 +43,7 @@ const MainSection = () => {
     // get the current mouse position
     let mx = parseInt(e.clientX - offsetX);
     let my = parseInt(e.clientY - offsetY);
-
+    let currentSelectedIndex = -1;
     let elementsObj = elements;
     drawElements(elementsObj);
     clearDragFlags();
@@ -55,10 +55,12 @@ const MainSection = () => {
         if (anchorHitTest(mx, my, r)) {
           draggingResizer = true;
           r.isResizing = true;
+          break;
         }
       }
       if (mx > r.x && mx < r.x + r.width && my > r.y && my < r.y + r.height) {
         // if yes, set that element isDragging=true
+        currentSelectedIndex = i;
         draggingElement = true;
         r.isSelected = true;
         r.isDragging = true;
@@ -68,6 +70,12 @@ const MainSection = () => {
         break;
       }
     }
+    if (currentSelectedIndex > -1)
+      for (let i = 0; i < elementsObj.length; i++) {
+        if (i !== currentSelectedIndex) {
+          elementsObj[i].isSelected = false;
+        }
+      }
     setElements(elementsObj);
 
     // save the current mouse position
@@ -92,16 +100,19 @@ const MainSection = () => {
         let r = elementsObj[i];
         if (
           r.isResizing &&
-          r.height + dy > 10 &&
-          r.x + r.width + dx + 24 < canvasRef.current.width &&
-          r.y + r.height + dy + 24 < canvasRef.current.height
+          r.height + dy > 10
+          // &&
+          // r.x + r.width + dx + 24 < canvasRef.current.width &&
+          // r.y + r.height + dy + 24 < canvasRef.current.height
         ) {
           if (r.type === "picture") {
             r.height += dy;
             r.width += dx;
           } else {
+            let ratio = (r.height + dy) / r.height;
             r.height += dy;
-            r.width = context.measureText(r.value).width;
+            r.width *= ratio;
+            // r.width = context.measureText(r.value).width;
           }
         }
       }
