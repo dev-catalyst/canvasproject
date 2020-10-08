@@ -300,8 +300,8 @@ const MainSection = () => {
         index: elements.length,
         x: 0,
         y: 0,
-        height: 60,
-        width: 60,
+        height: 40,
+        width: 40,
         isDragging: false,
         isSelected: false,
         isResizing: false,
@@ -371,15 +371,26 @@ const MainSection = () => {
 
       context.fillStyle = text.color;
       context.font = `${text.height}px ${text.font}`;
-      // context.fillText(text.value, text.x, text.height + text.y);
-
       context.save();
-      context.translate(text.width / 2, text.height / 2);
+      context.translate((text.x + text.width) / 2, (text.y + text.height) / 2);
       context.rotate((text.rotationAngle * Math.PI) / 180);
-      context.translate(-text.width / 2, -text.height / 2);
-
-      context.fillText(text.value, text.x, text.y);
+      if (text.type === "text" || text.type === "emoji") {
+        // context.translate(-text.width / 2, -text.height / 2);
+        context.fillText(text.value, -text.width / 2, -text.height / 2);
+      }
+      if (text.type === "picture") {
+        let image = new Image();
+        image.src = text.value;
+        context.drawImage(
+          image,
+          -text.width / 2,
+          -text.height / 2,
+          text.width,
+          text.height
+        );
+      }
       context.restore();
+
       if (text.isDragging && text.isSelected) {
         context.beginPath();
         context.rect(text.x, text.y, text.width, text.height);
@@ -525,12 +536,31 @@ const MainSection = () => {
                 </button>
               </div>
             ) : (
-              <button
-                style={{ backgroundColor: "#ff0000", marginRight: "20px" }}
-                onClick={deleteCurrentSelected}
-              >
-                Delete
-              </button>
+              <>
+                <div className="rotation-wrap">
+                  <p>Rotation</p>
+                  <div className="rotation">
+                    <input
+                      type="range"
+                      id="rotate"
+                      min="-180"
+                      max="180"
+                      value={currentSelectedRotate}
+                      onChange={(e) => {
+                        setCurrentSelectedRotate(e.target.value);
+                        updateRotationAngle();
+                      }}
+                    />
+                    <span>{currentSelectedRotate}</span>
+                  </div>
+                </div>
+                <button
+                  style={{ backgroundColor: "#ff0000", marginRight: "20px" }}
+                  onClick={deleteCurrentSelected}
+                >
+                  Delete
+                </button>
+              </>
             )
           ) : (
             <>
