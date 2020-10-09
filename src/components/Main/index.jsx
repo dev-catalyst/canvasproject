@@ -96,7 +96,7 @@ const MainSection = () => {
       let dy = my - startY;
 
       let elementsObj = elements;
-      let context = canvasRef.current.getContext("2d");
+      // let context = canvasRef.current.getContext("2d");
       for (let i = 0; i < elementsObj.length; i++) {
         let r = elementsObj[i];
         if (
@@ -184,7 +184,7 @@ const MainSection = () => {
   // ***************************** EMOJIS *********************************//
   useEffect(() => {
     if (chosenEmoji) {
-      addTextToShirt("emoji");
+      addElementToShirt("emoji");
     }
   }, [chosenEmoji]);
 
@@ -195,7 +195,7 @@ const MainSection = () => {
   // ***************************** PICTURE *********************************//
   useEffect(() => {
     if (picture) {
-      addTextToShirt("picture");
+      addElementToShirt("picture");
     }
   }, [picture]);
 
@@ -272,7 +272,7 @@ const MainSection = () => {
   }
 
   //****** to add element to shirt *************//
-  function addTextToShirt(type) {
+  function addElementToShirt(type) {
     let context = canvasRef.current.getContext("2d");
     let elementObj;
     if (type === "text") {
@@ -332,76 +332,86 @@ const MainSection = () => {
   }
 
   //****** to draw elements on shirt *************//
-  function drawElements(textArray) {
+  function drawElements(elementsArray) {
     let context = canvasRef.current.getContext("2d");
 
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    for (let i = 0; i < textArray.length; i++) {
-      let text = textArray[i];
-      if (text.type === "text") {
-        context.fillStyle = text.color;
-        context.font = `${text.height}px ${text.font}`;
-        context.fillText(text.value, text.x, text.height + text.y);
-      } else if (text.type === "emoji") {
-        context.font = `${text.height}px Arial`;
-        context.fillText(text.value, text.x, text.height + text.y);
-      } else if (text.type === "picture") {
+    for (let i = 0; i < elementsArray.length; i++) {
+      let element = elementsArray[i];
+      if (element.type === "text") {
+        context.fillStyle = element.color;
+        context.font = `${element.height}px ${element.font}`;
+        if (element.rotationAngle !== 0) {
+          drawRotated(element);
+        } else {
+          context.fillText(
+            element.value,
+            element.x,
+            element.height + element.y
+          );
+        }
+      } else if (element.type === "emoji") {
+        context.font = `${element.height}px Arial`;
+        if (element.rotationAngle !== 0) {
+          drawRotated(element);
+        } else {
+          context.fillText(
+            element.value,
+            element.x,
+            element.height + element.y
+          );
+        }
+      } else if (element.type === "picture") {
         let image = new Image();
-        image.src = text.value;
-        context.drawImage(image, text.x, text.y, text.width, text.height);
+        image.src = element.value;
+        if (element.rotationAngle !== 0) {
+          drawRotated(element);
+        } else {
+          context.drawImage(
+            image,
+            element.x,
+            element.y,
+            element.width,
+            element.height
+          );
+        }
       }
-      if (text.isDragging && text.isSelected) {
+      if (element.isDragging && element.isSelected) {
         context.beginPath();
-        context.rect(text.x, text.y, text.width, text.height);
+        context.rect(element.x, element.y, element.width, element.height);
         context.closePath();
         context.stroke();
       }
-      if (text.isResizing) {
-        drawResizeImage(text);
+      if (element.isResizing) {
+        drawResizeImage(element);
       }
     }
   }
 
   //****** to rotate element (not finished)*************//
-  function drawRotated(textArray) {
+  function drawRotated(element) {
     let context = canvasRef.current.getContext("2d");
-
-    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    for (let i = 0; i < textArray.length; i++) {
-      let text = textArray[i];
-
-      context.fillStyle = text.color;
-      context.font = `${text.height}px ${text.font}`;
-      context.save();
-      context.translate((text.x + text.width) / 2, (text.y + text.height) / 2);
-      context.rotate((text.rotationAngle * Math.PI) / 180);
-      if (text.type === "text" || text.type === "emoji") {
-        // context.translate(-text.width / 2, -text.height / 2);
-        context.fillText(text.value, -text.width / 2, -text.height / 2);
-      }
-      if (text.type === "picture") {
-        let image = new Image();
-        image.src = text.value;
-        context.drawImage(
-          image,
-          -text.width / 2,
-          -text.height / 2,
-          text.width,
-          text.height
-        );
-      }
-      context.restore();
-
-      if (text.isDragging && text.isSelected) {
-        context.beginPath();
-        context.rect(text.x, text.y, text.width, text.height);
-        context.closePath();
-        context.stroke();
-      }
-      if (text.isResizing) {
-        drawResizeImage(text);
-      }
+    context.save();
+    context.translate(
+      (element.x + element.width) / 2,
+      (element.y + element.height) / 2
+    );
+    context.rotate((element.rotationAngle * Math.PI) / 180);
+    if (element.type === "text" || element.type === "emoji") {
+      context.fillText(element.value, -element.width / 2, -element.height / 2);
     }
+    if (element.type === "picture") {
+      let image = new Image();
+      image.src = element.value;
+      context.drawImage(
+        image,
+        -element.width / 2,
+        -element.height / 2,
+        element.width,
+        element.height
+      );
+    }
+    context.restore();
   }
 
   //****** to clear the checks that element is dragging *************//
@@ -458,13 +468,13 @@ const MainSection = () => {
   }
 
   function updateRotationAngle() {
-    let selectedText = currentSelected;
-    selectedText.rotationAngle = currentSelectedRotate;
+    let selected = currentSelected;
+    selected.rotationAngle = currentSelectedRotate;
 
     let updated = elements;
-    updated[selectedText.index] = selectedText;
+    updated[selected.index] = selected;
 
-    drawRotated(updated);
+    drawElements(updated);
     setElements(updated);
   }
 
@@ -588,7 +598,7 @@ const MainSection = () => {
               </div>
               <button
                 onClick={() => {
-                  addTextToShirt("text");
+                  addElementToShirt("text");
                 }}
               >
                 Add
