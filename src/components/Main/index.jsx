@@ -62,6 +62,7 @@ const MainSection = () => {
         // if yes, set that element isDragging=true
         currentSelectedIndex = i;
         draggingElement = true;
+        r.index = i;
         r.isSelected = true;
         r.isDragging = true;
         getValuesOfCurrentSelected(r);
@@ -278,7 +279,7 @@ const MainSection = () => {
       context.font = `40px ${font}`;
       if (text) {
         elementObj = {
-          index: elements.length,
+          // index: elements.length,
           x: 0,
           y: 0,
           width: context.measureText(text).width,
@@ -297,7 +298,7 @@ const MainSection = () => {
     } else if (type === "emoji") {
       // context.font = `40px Arial`;
       elementObj = {
-        index: elements.length,
+        // index: elements.length,
         x: 0,
         y: 0,
         height: 40,
@@ -311,7 +312,7 @@ const MainSection = () => {
       };
     } else if (type === "picture") {
       elementObj = {
-        index: elements.length,
+        // index: elements.length,
         x: 0,
         y: 0,
         height: picture.height,
